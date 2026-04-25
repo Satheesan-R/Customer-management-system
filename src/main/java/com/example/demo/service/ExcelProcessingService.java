@@ -1,6 +1,7 @@
-git statuspackage com.example.demo.service;
+package com.example.demo.service;
 
 import com.example.demo.entity.Customer;
+import com.example.demo.entity.MobileNumber;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -145,7 +146,9 @@ public class ExcelProcessingService {
         for (int i = 3; i < row.getLastCellNum(); i++) {
             String mobileNumber = getCellValueAsString(row.getCell(i));
             if (mobileNumber != null && !mobileNumber.trim().isEmpty()) {
-                customer.getMobileNumbers().add(mobileNumber.trim());
+                MobileNumber mobile = new MobileNumber();
+                mobile.setNumber(mobileNumber.trim());
+                customer.getMobileNumbers().add(mobile);
             }
         }
         
