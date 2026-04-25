@@ -74,7 +74,9 @@ public class CustomerService {
     }
 
     public boolean existsByNic(String nic) {
-        return customerRepository.existsByNic(nic);
+        if (nic == null) return false;
+        String normalizedNic = nic.trim().toLowerCase();
+        return customerRepository.existsByNic(normalizedNic);
     }
 
     // Address operations

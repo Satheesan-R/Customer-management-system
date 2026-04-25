@@ -38,7 +38,13 @@ public class Customer {
     public void setDob(LocalDate dob) { this.dob = dob; }
 
     public String getNic() { return nic; }
-    public void setNic(String nic) { this.nic = nic; }
+    public void setNic(String nic) {
+        if (nic != null) {
+            this.nic = nic.trim().toLowerCase();
+        } else {
+            this.nic = null;
+        }
+    }
 
     public Set<MobileNumber> getMobileNumbers() { return mobileNumbers; }
     public void setMobileNumbers(Set<MobileNumber> mobileNumbers) { this.mobileNumbers = mobileNumbers; }
