@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CustomerDTO;
+import com.example.demo.dto.AddressDTO;
+import com.example.demo.dto.FamilyMemberDTO;
 import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +114,13 @@ public class CustomerService {
         Optional<Customer> customerOpt = customerRepository.findById(customerId);
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
-            customer.getMobileNumbers().add(mobileNumber);
+            MobileNumber mobile = new MobileNumber();
+            mobile.setNumber(mobileNumber);
+            mobile.setCustomer(customer);
+            if (customer.getMobileNumbers() == null) {
+                customer.setMobileNumbers(new java.util.HashSet<>());
+            }
+            customer.getMobileNumbers().add(mobile);
             return customerRepository.save(customer);
         }
         throw new RuntimeException("Customer not found with id: " + customerId);
@@ -122,7 +130,9 @@ public class CustomerService {
         Optional<Customer> customerOpt = customerRepository.findById(customerId);
         if (customerOpt.isPresent()) {
             Customer customer = customerOpt.get();
-            customer.getMobileNumbers().remove(mobileNumber);
+            if (customer.getMobileNumbers() != null) {
+                customer.getMobileNumbers().removeIf(m -> m.getNumber().equals(mobileNumber));
+            }
             return customerRepository.save(customer);
         }
         throw new RuntimeException("Customer not found with id: " + customerId);
@@ -135,17 +145,17 @@ public class CustomerService {
         dto.setName(customer.getName());
         dto.setDob(customer.getDob());
         dto.setNic(customer.getNic());
-        dto.setMobileNumbers(customer.getMobileNumbers());
+        
+        // Convert mobile numbers to strings
+        if (customer.getMobileNumbers() != null) {
+            dto.setMobileNumbers(customer.getMobileNumbers().stream()
+                .map(m -> m.getNumber())
+                .collect(Collectors.toSet()));
+        }
         
         if (customer.getAddresses() != null) {
             dto.setAddresses(customer.getAddresses().stream()
                 .map(this::convertAddressToDTO)
-                .collect(Collectors.toList()));
-        }
-        
-        if (customer.getFamilyMembers() != null) {
-            dto.setFamilyMembers(customer.getFamilyMembers().stream()
-                .map(this::convertFamilyMemberToDTO)
                 .collect(Collectors.toList()));
         }
         
@@ -155,8 +165,8 @@ public class CustomerService {
     private AddressDTO convertAddressToDTO(Address address) {
         AddressDTO dto = new AddressDTO();
         dto.setId(address.getId());
-        dto.setAddressLine1(address.getAddressLine1());
-        dto.setAddressLine2(address.getAddressLine2());
+        dto.setAddressLine1(address.getLine1());
+        dto.setAddressLine2(address.getLine2());
         if (address.getCity() != null) {
             dto.setCity(address.getCity().getName());
             if (address.getCity().getCountry() != null) {
@@ -183,7 +193,7 @@ public class CustomerService {
         customer.setName(dto.getName());
         customer.setDob(dto.getDob());
         customer.setNic(dto.getNic());
-        customer.setMobileNumbers(dto.getMobileNumbers());
+        // Note: Mobile numbers are handled separately in the controller
         return customer;
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 public interface CityRepository extends JpaRepository<City, Long> {
     List<City> findByCountryId(Long countryId);
     City findByNameAndCountryId(String name, Long countryId);
+    City findByName(String name);
     
     @Query("SELECT c FROM City c WHERE c.name LIKE %:name%")
     List<City> findByNameContaining(@Param("name") String name);

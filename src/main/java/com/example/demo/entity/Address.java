@@ -10,11 +10,11 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "address_line_1", nullable = false)
-    private String addressLine1;
+    @Column(name = "line1", nullable = false)
+    private String line1;
     
-    @Column(name = "address_line_2")
-    private String addressLine2;
+    @Column(name = "line2")
+    private String line2;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
@@ -24,39 +24,29 @@ public class Address {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
     
-    // Constructors
-    public Address() {}
-    
-    public Address(String addressLine1, String addressLine2, City city, Customer customer) {
-        this.addressLine1 = addressLine1;
-        this.addressLine2 = addressLine2;
-        this.city = city;
-        this.customer = customer;
+    // Getters and setters
+    public Long getId() { 
+        return id; 
     }
     
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    public void setId(Long id) { 
+        this.id = id; 
     }
     
-    public void setId(Long id) {
-        this.id = id;
+    public String getLine1() { 
+        return line1; 
     }
     
-    public String getAddressLine1() {
-        return addressLine1;
+    public void setLine1(String line1) { 
+        this.line1 = line1; 
     }
     
-    public void setAddressLine1(String addressLine1) {
-        this.addressLine1 = addressLine1;
+    public String getLine2() { 
+        return line2; 
     }
     
-    public String getAddressLine2() {
-        return addressLine2;
-    }
-    
-    public void setAddressLine2(String addressLine2) {
-        this.addressLine2 = addressLine2;
+    public void setLine2(String line2) { 
+        this.line2 = line2; 
     }
     
     public City getCity() {
