@@ -28,9 +28,30 @@ public class CustomerController {
     // Basic CRUD operations
     @PostMapping
     public ResponseEntity<Customer> create(@RequestBody Customer customer) {
-        if (service.existsByNic(customer.getNic())) {
+        // Normalize NIC for uniqueness check
+        String normalizedNic = customer.getNic() != null ? customer.getNic().trim().toLowerCase() : null;
+        if (normalizedNic == null || normalizedNic.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        if (service.existsByNic(normalizedNic)) {
             return ResponseEntity.badRequest().build();
         }
+        customer.setNic(normalizedNic);
+
+        // Convert mobileNumbers (if present) from string to MobileNumber entities
+        if (customer.getMobileNumbers() != null && !customer.getMobileNumbers().isEmpty()) {
+            java.util.Set<com.example.demo.entity.MobileNumber> mobileEntities = new java.util.HashSet<>();
+            for (com.example.demo.entity.MobileNumber m : customer.getMobileNumbers()) {
+                if (m.getNumber() != null && !m.getNumber().trim().isEmpty()) {
+                    com.example.demo.entity.MobileNumber mobile = new com.example.demo.entity.MobileNumber();
+                    mobile.setNumber(m.getNumber().trim());
+                    mobile.setCustomer(customer);
+                    mobileEntities.add(mobile);
+                }
+            }
+            customer.setMobileNumbers(mobileEntities);
+        }
+
         Customer savedCustomer = service.save(customer);
         return ResponseEntity.ok(savedCustomer);
     }
