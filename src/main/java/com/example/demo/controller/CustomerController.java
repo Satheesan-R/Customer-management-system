@@ -39,8 +39,8 @@ public class CustomerController {
         customer.setNic(normalizedNic);
 
         // Convert mobileNumbers (if present) from string to MobileNumber entities
-        if (customer.getMobileNumbers() != null && !customer.getMobileNumbers().isEmpty()) {
-            java.util.Set<com.example.demo.entity.MobileNumber> mobileEntities = new java.util.HashSet<>();
+        java.util.Set<com.example.demo.entity.MobileNumber> mobileEntities = new java.util.HashSet<>();
+        if (customer.getMobileNumbers() != null) {
             for (com.example.demo.entity.MobileNumber m : customer.getMobileNumbers()) {
                 if (m.getNumber() != null && !m.getNumber().trim().isEmpty()) {
                     com.example.demo.entity.MobileNumber mobile = new com.example.demo.entity.MobileNumber();
@@ -49,8 +49,8 @@ public class CustomerController {
                     mobileEntities.add(mobile);
                 }
             }
-            customer.setMobileNumbers(mobileEntities);
         }
+        customer.setMobileNumbers(mobileEntities);
 
         Customer savedCustomer = service.save(customer);
         return ResponseEntity.ok(savedCustomer);
@@ -79,6 +79,21 @@ public class CustomerController {
         Optional<Customer> existingCustomer = service.findById(id);
         if (existingCustomer.isPresent()) {
             customer.setId(id);
+            
+            // Convert mobileNumbers (if present) from string to MobileNumber entities
+            java.util.Set<com.example.demo.entity.MobileNumber> mobileEntities = new java.util.HashSet<>();
+            if (customer.getMobileNumbers() != null) {
+                for (com.example.demo.entity.MobileNumber m : customer.getMobileNumbers()) {
+                    if (m.getNumber() != null && !m.getNumber().trim().isEmpty()) {
+                        com.example.demo.entity.MobileNumber mobile = new com.example.demo.entity.MobileNumber();
+                        mobile.setNumber(m.getNumber().trim());
+                        mobile.setCustomer(customer);
+                        mobileEntities.add(mobile);
+                    }
+                }
+            }
+            customer.setMobileNumbers(mobileEntities);
+            
             Customer updatedCustomer = service.save(customer);
             return ResponseEntity.ok(updatedCustomer);
         }
