@@ -119,7 +119,7 @@ public class ExcelProcessingService {
         String name = getCellValueAsString(row.getCell(0));
         String dobStr = getCellValueAsString(row.getCell(1));
         String nic = getCellValueAsString(row.getCell(2));
-        
+
         // Validate mandatory fields
         if (name == null || name.trim().isEmpty()) {
             throw new Exception("Name is required");
@@ -130,28 +130,33 @@ public class ExcelProcessingService {
         if (nic == null || nic.trim().isEmpty()) {
             throw new Exception("NIC is required");
         }
-        
+
         // Parse date of birth
         LocalDate dob = parseDate(dobStr);
         if (dob == null) {
             throw new Exception("Invalid date format: " + dobStr);
         }
-        
+
         Customer customer = new Customer();
         customer.setName(name.trim());
         customer.setDob(dob);
         customer.setNic(nic.trim());
-        
-        // Add mobile numbers from column 4 onwards (optional)
+
+        // Add mobile numbers from column 4 onwards (now required)
+        boolean hasMobile = false;
         for (int i = 3; i < row.getLastCellNum(); i++) {
             String mobileNumber = getCellValueAsString(row.getCell(i));
             if (mobileNumber != null && !mobileNumber.trim().isEmpty()) {
                 MobileNumber mobile = new MobileNumber();
                 mobile.setNumber(mobileNumber.trim());
                 customer.getMobileNumbers().add(mobile);
+                hasMobile = true;
             }
         }
-        
+        if (!hasMobile) {
+            throw new Exception("At least one mobile number is required");
+        }
+
         return customer;
     }
     
